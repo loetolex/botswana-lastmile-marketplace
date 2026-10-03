@@ -149,7 +149,7 @@ export function ClientWorkspace() {
               <div className="p-5">
                 <p className="text-sm text-slate-500">{r.cuisines.join(" · ")} · {r.area}</p>
                 <div className="mt-3 flex items-center justify-between text-sm">
-                  <span className="font-bold text-amber-600">★ {r.rating}{r.reviews ? ` (${r.reviews})` : ""}</span>
+                  <span className="font-bold text-amber-600">{typeof r.rating==="number" ? <>★ {r.rating}{r.reviews ? ` (${r.reviews})` : ""}</> : "New · unrated"}</span>
                   <span className="font-semibold text-slate-700">P{r.deliveryFee} delivery</span>
                 </div>
               </div>
