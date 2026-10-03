@@ -3,6 +3,10 @@ import type {
   Address, CartLine, DeliveryOffer, MenuItem, Restaurant, RestaurantOrder
 } from "@loetogo/domain";
 import { DynamicArrayField } from "../components/DynamicArrayField";
+import { CheckoutPanel } from "./CheckoutPanel";
+import { MapPlaceholder } from "./MapPlaceholder";
+import { LocalRepository } from "../lib/localRepository";
+import { storage } from "../lib/storage";
 
 const restaurants: Restaurant[] = [
   { id:"r1", name:"Mokolodi Kitchen", cuisines:["Setswana","Grill"], area:"Gaborone", etaMinutes:28, deliveryFee:{amount:18,currency:"BWP"}, rating:4.8, open:true },
@@ -31,19 +35,54 @@ function Money({ amount }: { amount:number }) {
 }
 
 export function ClientWorkspace() {
+  const repository = useMemo(()=>new LocalRepository(storage),[]);
   const [selectedRestaurant, setSelectedRestaurant] = useState<Restaurant | null>(null);
   const [cart, setCart] = useState<CartLine[]>([]);
   const [address, setAddress] = useState<Address>({label:"Home",area:"Gaborone",landmark:""});
   const [filters, setFilters] = useState<string[]>(["Fast delivery"]);
+  const [checkoutOpen,setCheckoutOpen] = useState(false);
+  const [lastOrder,setLastOrder] = useState<string | null>(null);
+
+  useEffect(()=>{ repository.getCart().then(setCart); },[repository]);
 
   const total = cart.reduce((sum, line) => sum + line.quantity * line.unitPrice.amount, 0);
 
   const addItem = (item: MenuItem) => {
     setCart(lines => {
       const existing = lines.find(line => line.itemId === item.id);
-      if (existing) return lines.map(line => line.itemId === item.id ? {...line, quantity:line.quantity + 1} : line);
-      return [...lines,{id:crypto.randomUUID(),itemId:item.id,name:item.name,quantity:1,unitPrice:item.price}];
+      const next = existing
+        ? lines.map(line => line.itemId === item.id ? {...line, quantity:line.quantity + 1} : line)
+        : [...lines,{id:crypto.randomUUID(),itemId:item.id,name:item.name,quantity:1,unitPrice:item.price}];
+      repository.saveCart(next);
+      return next;
     });
+  };
+
+  const placeOrder = async (paymentMethod:"cash"|"mobile_money"|"card") => {
+    const id = `LG-${Math.floor(1000 + Math.random()*9000)}`;
+    const deliveryFee = selectedRestaurant?.deliveryFee.amount ?? 18;
+    await repository.saveCheckoutDraft({
+      id,
+      restaurantId:selectedRestaurant?.id ?? "mixed",
+      addressLabel:`${address.label} · ${address.area}`,
+      paymentMethod,
+      lines:cart,
+      subtotal:total,
+      deliveryFee,
+      total:total+deliveryFee
+    });
+    await repository.addOrder({
+      id,
+      customerName:"Local test customer",
+      items:cart.map(line=>({name:line.name,quantity:line.quantity})),
+      total:{amount:total+deliveryFee,currency:"BWP"},
+      status:"placed",
+      promisedMinutes:selectedRestaurant?.etaMinutes ?? 30
+    });
+    await repository.saveCart([]);
+    setCart([]);
+    setCheckoutOpen(false);
+    setLastOrder(id);
   };
 
   return (
@@ -111,10 +150,24 @@ export function ClientWorkspace() {
         <section className="sticky bottom-24 rounded-[2rem] bg-slate-950 p-5 text-white md:bottom-6">
           <div className="flex items-center justify-between">
             <div><p className="text-xs text-white/60">{cart.reduce((s,l)=>s+l.quantity,0)} items</p><p className="text-xl font-black"><Money amount={total}/></p></div>
-            <button className="rounded-full bg-white px-5 py-3 text-sm font-black text-slate-950">Review cart</button>
+            <button onClick={()=>setCheckoutOpen(true)} className="rounded-full bg-white px-5 py-3 text-sm font-black text-slate-950">Review cart</button>
           </div>
         </section>
       )}
+
+      {checkoutOpen && cart.length > 0 && (
+        <CheckoutPanel lines={cart} deliveryFee={selectedRestaurant?.deliveryFee.amount ?? 18} onPlaceOrder={placeOrder}/>
+      )}
+
+      {lastOrder && (
+        <section className="rounded-[2rem] bg-emerald-50 p-6">
+          <p className="text-xs font-black uppercase tracking-wide text-emerald-700">Order placed locally</p>
+          <h3 className="mt-2 text-2xl font-black">{lastOrder}</h3>
+          <p className="mt-1 text-sm text-slate-600">Saved through LocalRepository. Google Drive will later implement the same persistence boundary.</p>
+        </section>
+      )}
+
+      <MapPlaceholder pickup={selectedRestaurant?.name ?? "Restaurant"} dropoff={`${address.label}, ${address.area}`} />
     </div>
   );
 }
@@ -166,6 +219,7 @@ export function DriverWorkspace() {
           <p className="mt-1 text-sm text-white/60">6 completed deliveries</p>
         </div>
         {activeOffer && <div className="rounded-[2rem] bg-emerald-50 p-6"><p className="text-xs font-bold uppercase text-emerald-700">Active delivery</p><h3 className="mt-2 font-black">{activeOffer.pickupArea} → {activeOffer.dropoffArea}</h3></div>}
+        {activeOffer && <MapPlaceholder pickup={activeOffer.pickupArea} dropoff={activeOffer.dropoffArea}/>}
       </aside>
     </div>
   );
