@@ -121,38 +121,38 @@ export default function App() {
       {nav.map((item,index)=>{
         const focused=active===item;
         const icons=["home-outline","search-outline","receipt-outline","person-outline"] as const;
-        return <TouchableOpacity key={item} onPress={()=>setActive(item)} style={styles.navItem}><Ionicons name={icons[index]} size={24} color={focused?"#0f172a":"#94a3b8"}/><Text style={[styles.navText,focused&&styles.navTextActive]}>{item}</Text></TouchableOpacity>;
+        return <TouchableOpacity key={item} onPress={()=>setActive(item)} style={styles.navItem}><Ionicons name={icons[index]} size={24} color={focused?"#2563eb":"#94a3b8"}/><Text style={[styles.navText,focused&&styles.navTextActive]}>{item}</Text></TouchableOpacity>;
       })}
     </View>
   </SafeAreaView>;
 }
 
 const styles=StyleSheet.create({
-  safe:{flex:1,backgroundColor:"#f7f8fa"},
+  safe:{flex:1,backgroundColor:"#f5f9ff"},
   header:{paddingHorizontal:20,paddingTop:8,paddingBottom:12,backgroundColor:"#fff"},
-  brand:{fontSize:22,fontWeight:"900",color:"#0f172a"},
+  brand:{fontSize:22,fontWeight:"900",color:"#1e3a8a"},
   muted:{marginTop:2,fontSize:12,color:"#64748b"},
   content:{padding:20,paddingBottom:120},
   roleRow:{gap:8,paddingBottom:18},
   rolePill:{paddingHorizontal:16,paddingVertical:10,borderRadius:999,backgroundColor:"#fff"},
-  rolePillActive:{backgroundColor:"#0f172a"},
+  rolePillActive:{backgroundColor:"#2563eb"},
   roleText:{textTransform:"capitalize",color:"#334155",fontWeight:"700"},
   roleTextActive:{color:"#fff"},
-  hero:{backgroundColor:"#0f172a",borderRadius:28,padding:24,minHeight:210,justifyContent:"flex-end"},
+  hero:{backgroundColor:"#2563eb",borderRadius:28,padding:24,minHeight:210,justifyContent:"flex-end"},
   heroEyebrow:{color:"#94a3b8",fontSize:12,fontWeight:"800",letterSpacing:1.2},
   heroTitle:{color:"#fff",fontSize:38,fontWeight:"900",marginTop:8},
   sectionHeader:{marginBottom:2},
-  sectionTitle:{fontSize:22,fontWeight:"900",color:"#0f172a",marginBottom:8},
+  sectionTitle:{fontSize:22,fontWeight:"900",color:"#1e3a8a",marginBottom:8},
   eyebrow:{color:"#64748b",fontSize:11,fontWeight:"800",letterSpacing:.8},
   card:{backgroundColor:"#fff",borderRadius:24,padding:18},
-  cardTitle:{color:"#0f172a",fontSize:18,fontWeight:"800",marginTop:5},
+  cardTitle:{color:"#1e3a8a",fontSize:18,fontWeight:"800",marginTop:5},
   cardCopy:{color:"#64748b",marginTop:5,lineHeight:20},
   imagePlaceholder:{height:128,borderRadius:18,backgroundColor:"#e2e8f0",padding:12,marginBottom:14},
   imageBadge:{alignSelf:"flex-start",backgroundColor:"#fff",paddingHorizontal:10,paddingVertical:6,borderRadius:999,fontSize:11,fontWeight:"800"},
   rowBetween:{flexDirection:"row",alignItems:"center",justifyContent:"space-between",gap:12},
-  smallStrong:{fontSize:12,fontWeight:"800",color:"#0f172a"},
-  pay:{fontSize:27,fontWeight:"900",color:"#0f172a",marginTop:2},
-  action:{backgroundColor:"#0f172a",paddingHorizontal:18,paddingVertical:12,borderRadius:999},
+  smallStrong:{fontSize:12,fontWeight:"800",color:"#1e3a8a"},
+  pay:{fontSize:27,fontWeight:"900",color:"#1e3a8a",marginTop:2},
+  action:{backgroundColor:"#2563eb",paddingHorizontal:18,paddingVertical:12,borderRadius:999},
   actionSuccess:{backgroundColor:"#059669"},
   actionText:{color:"#fff",fontWeight:"800"},
   successCard:{backgroundColor:"#d1fae5",borderRadius:24,padding:18},
@@ -160,14 +160,14 @@ const styles=StyleSheet.create({
   status:{backgroundColor:"#f1f5f9",borderRadius:999,paddingHorizontal:10,paddingVertical:6,fontSize:11,fontWeight:"800"},
   chipRow:{flexDirection:"row",flexWrap:"wrap",gap:8,marginTop:10,marginBottom:8},
   chip:{backgroundColor:"#fff",borderWidth:1,borderColor:"#e2e8f0",paddingHorizontal:13,paddingVertical:9,borderRadius:999},
-  chipActive:{backgroundColor:"#0f172a",borderColor:"#0f172a"},
+  chipActive:{backgroundColor:"#2563eb",borderColor:"#0f172a"},
   chipText:{fontSize:12,fontWeight:"700",color:"#334155"},
   chipTextActive:{color:"#fff"},
   statsGrid:{flexDirection:"row",flexWrap:"wrap",gap:10},
   statCard:{width:"48%",backgroundColor:"#fff",borderRadius:20,padding:16},
-  statValue:{fontSize:28,fontWeight:"900",color:"#0f172a",marginTop:4},
+  statValue:{fontSize:28,fontWeight:"900",color:"#1e3a8a",marginTop:4},
   bottomNav:{position:"absolute",left:0,right:0,bottom:0,flexDirection:"row",paddingTop:10,paddingBottom:18,backgroundColor:"rgba(255,255,255,.97)",borderTopWidth:StyleSheet.hairlineWidth,borderTopColor:"#e2e8f0"},
   navItem:{flex:1,alignItems:"center",gap:4},
   navText:{fontSize:10,fontWeight:"700",color:"#94a3b8"},
-  navTextActive:{color:"#0f172a"}
+  navTextActive:{color:"#1e3a8a"}
 });
