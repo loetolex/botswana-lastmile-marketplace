@@ -9,7 +9,7 @@ export type DemoStorefront = {
   name: string;
   area: string;
   cuisines: string[];
-  rating: number;
+  rating?: number;
   reviews?: number;
   etaMinutes: number;
   deliveryFee: number;
@@ -86,16 +86,16 @@ export const gaboroneStorefronts: DemoStorefront[] = [
   {id:"edlas",name:"Ed-La's Chisanyama",area:"Masiakgang",cuisines:["African","Braai"],rating:3.5,reviews:2,etaMinutes:32,deliveryFee:20,brand:["#ea580c","#431407"],image:foodImages.grill,sourceLabel:"Public listing",sourceUrl:T},
   {id:"nandos-riverwalk",name:"Nando's Riverwalk",area:"Riverwalk Mall",cuisines:["Chicken","PERi-PERi"],rating:4.2,reviews:25,etaMinutes:22,deliveryFee:15,brand:["#dc2626","#111827"],image:foodImages.chicken,sourceLabel:"Official menu",sourceUrl:"https://www.nandos.co.bw/eat/order/",menu:[{name:"Flame-grilled PERi-PERi chicken",note:"Official menu category"},{name:"Everyone's Favourites",note:"Official menu collection"}]},
   {id:"nandos-broadhurst",name:"Nando's Broadhurst",area:"Broadhurst",cuisines:["Chicken","Fast food"],rating:3.8,reviews:5,etaMinutes:24,deliveryFee:15,brand:["#dc2626","#111827"],image:foodImages.chicken,sourceLabel:"Public listing",sourceUrl:T},
-  {id:"debonairs-main",name:"Debonairs Pizza Main Mall",area:"Main Mall",cuisines:["Pizza","Fast food"],rating:4.0,etaMinutes:24,deliveryFee:15,brand:["#2563eb","#dc2626"],image:foodImages.pizza,sourceLabel:"Public listing",sourceUrl:T},
+  {id:"debonairs-main",name:"Debonairs Pizza Main Mall",area:"Main Mall",cuisines:["Pizza","Fast food"],etaMinutes:24,deliveryFee:15,brand:["#2563eb","#dc2626"],image:foodImages.pizza,sourceLabel:"Public listing",sourceUrl:T},
   {id:"debonairs-rail",name:"Debonairs Pizza Rail Park Mall",area:"Rail Park Mall",cuisines:["Pizza","Fast food"],rating:3.0,reviews:2,etaMinutes:23,deliveryFee:15,brand:["#2563eb","#dc2626"],image:foodImages.pizza,sourceLabel:"Tripadvisor",sourceUrl:T},
-  {id:"debonairs-acacia",name:"Debonairs Pizza Acacia Mall",area:"Acacia Mall",cuisines:["Pizza","Fast food"],rating:4.0,etaMinutes:27,deliveryFee:17,brand:["#2563eb","#dc2626"],image:foodImages.pizza,sourceLabel:"Tripadvisor",sourceUrl:T},
+  {id:"debonairs-acacia",name:"Debonairs Pizza Acacia Mall",area:"Acacia Mall",cuisines:["Pizza","Fast food"],etaMinutes:27,deliveryFee:17,brand:["#2563eb","#dc2626"],image:foodImages.pizza,sourceLabel:"Tripadvisor",sourceUrl:T},
   {id:"kfc-riverwalk",name:"KFC Village Riverwalk",area:"Riverwalk",cuisines:["Chicken","Fast food"],rating:4.9,reviews:3517,etaMinutes:21,deliveryFee:15,brand:["#ef4444","#991b1b"],image:foodImages.chicken,sourceLabel:"2026 public ratings",sourceUrl:"https://eatoutmap.com/en/botswana/gaborone/best"},
   {id:"kfc-gamecity",name:"KFC Game City",area:"Game City",cuisines:["Chicken","Fast food"],rating:4.8,reviews:1945,etaMinutes:22,deliveryFee:15,brand:["#ef4444","#991b1b"],image:foodImages.chicken,sourceLabel:"2026 public ratings",sourceUrl:"https://eatoutmap.com/en/botswana/gaborone/best"},
-  {id:"steers-riverwalk",name:"Steers Riverwalk Mall",area:"Riverwalk Mall",cuisines:["Burgers","Grill"],rating:4.0,etaMinutes:25,deliveryFee:15,brand:["#f59e0b","#dc2626"],image:foodImages.grill,sourceLabel:"Public listing",sourceUrl:T},
-  {id:"panarottis",name:"Panarottis Turnrite",area:"Turnrite Shopping Mall",cuisines:["Italian","Pizza"],rating:4.0,etaMinutes:29,deliveryFee:18,brand:["#16a34a","#dc2626"],image:foodImages.pizza,sourceLabel:"Public listing",sourceUrl:T},
+  {id:"steers-riverwalk",name:"Steers Riverwalk Mall",area:"Riverwalk Mall",cuisines:["Burgers","Grill"],etaMinutes:25,deliveryFee:15,brand:["#f59e0b","#dc2626"],image:foodImages.grill,sourceLabel:"Public listing",sourceUrl:T},
+  {id:"panarottis",name:"Panarottis Turnrite",area:"Turnrite Shopping Mall",cuisines:["Italian","Pizza"],etaMinutes:29,deliveryFee:18,brand:["#16a34a","#dc2626"],image:foodImages.pizza,sourceLabel:"Public listing",sourceUrl:T},
   {id:"pedros",name:"Pedros Fields Mall",area:"The Fields Mall",cuisines:["Chicken","Fast food"],rating:4.4,reviews:313,etaMinutes:24,deliveryFee:15,brand:["#f97316","#111827"],image:foodImages.chicken,sourceLabel:"2026 public ratings",sourceUrl:"https://eatoutmap.com/en/botswana/gaborone/best"},
-  {id:"hungry-lion",name:"Hungry Lion Rail Park Mall",area:"Rail Park Mall",cuisines:["Chicken","Fast food"],rating:4.0,etaMinutes:23,deliveryFee:15,brand:["#facc15","#dc2626"],image:foodImages.chicken,sourceLabel:"Tripadvisor",sourceUrl:T},
-  {id:"casa-del-sol",name:"Casa del Sol",area:"Mowana Park Mall, Phakalane",cuisines:["European","Contemporary"],rating:4.4,etaMinutes:35,deliveryFee:22,brand:["#f59e0b","#f97316"],image:foodImages.fine,sourceLabel:"Official site",sourceUrl:"https://casadelsol.co.bw/",menu:[
+  {id:"hungry-lion",name:"Hungry Lion Rail Park Mall",area:"Rail Park Mall",cuisines:["Chicken","Fast food"],etaMinutes:23,deliveryFee:15,brand:["#facc15","#dc2626"],image:foodImages.chicken,sourceLabel:"Tripadvisor",sourceUrl:T},
+  {id:"casa-del-sol",name:"Casa del Sol",area:"Mowana Park Mall, Phakalane",cuisines:["European","Contemporary"],etaMinutes:35,deliveryFee:22,brand:["#f59e0b","#f97316"],image:foodImages.fine,sourceLabel:"Official site",sourceUrl:"https://casadelsol.co.bw/",menu:[
     {name:"Batata Onion Omelette",note:"Official site"},
     {name:"Beef Bourguignon",note:"Official site"},
     {name:"Coq au Vin",note:"Official site"},
