@@ -54,7 +54,7 @@ export function ClientWorkspace() {
       const existing = lines.find(line => line.itemId === itemId);
       const next = existing
         ? lines.map(line => line.itemId === itemId ? {...line, quantity:line.quantity + 1} : line)
-        : [...lines,{id:crypto.randomUUID(),itemId,name:item.name,quantity:1,unitPrice:{amount:item.price!,currency:"BWP"}}];
+        : [...lines,{id:crypto.randomUUID(),itemId,name:item.name,quantity:1,unitPrice:{amount:item.price!,currency:"BWP" as const}}];
       repository.saveCart(next);
       return next;
     });
