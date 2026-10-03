@@ -1,24 +1,13 @@
 import { useEffect, useMemo, useState } from "react";
 import type {
-  Address, CartLine, DeliveryOffer, MenuItem, Restaurant, RestaurantOrder
+  Address, CartLine, DeliveryOffer, RestaurantOrder
 } from "@loetogo/domain";
 import { DynamicArrayField } from "../components/DynamicArrayField";
 import { CheckoutPanel } from "./CheckoutPanel";
 import { MapPlaceholder } from "./MapPlaceholder";
 import { LocalRepository } from "../lib/localRepository";
 import { storage } from "../lib/storage";
-
-const restaurants: Restaurant[] = [
-  { id:"r1", name:"Mokolodi Kitchen", cuisines:["Setswana","Grill"], area:"Gaborone", etaMinutes:28, deliveryFee:{amount:18,currency:"BWP"}, rating:4.8, open:true },
-  { id:"r2", name:"Urban Bowl", cuisines:["Healthy","Wraps"], area:"CBD", etaMinutes:24, deliveryFee:{amount:15,currency:"BWP"}, rating:4.6, open:true },
-  { id:"r3", name:"Kgale Pizza Co.", cuisines:["Pizza","Fast food"], area:"Kgale", etaMinutes:35, deliveryFee:{amount:20,currency:"BWP"}, rating:4.7, open:true }
-];
-
-const menu: MenuItem[] = [
-  { id:"m1", restaurantId:"r1", name:"Seswaa Bowl", description:"Slow-cooked beef, pap and morogo", category:"Mains", price:{amount:78,currency:"BWP"}, available:true },
-  { id:"m2", restaurantId:"r1", name:"Grilled Chicken Plate", description:"Quarter chicken, chips and salad", category:"Mains", price:{amount:72,currency:"BWP"}, available:true },
-  { id:"m3", restaurantId:"r2", name:"Chicken Avo Wrap", description:"Chicken, avo, greens and house sauce", category:"Wraps", price:{amount:64,currency:"BWP"}, available:true }
-];
+import { gaboroneStorefronts, type DemoMenuItem, type DemoStorefront } from "../data/gaboroneRestaurants";
 
 const offers: DeliveryOffer[] = [
   { id:"o1", restaurant:"Mokolodi Kitchen", pickupArea:"Main Mall", dropoffArea:"Block 8", estimatedKm:6.4, estimatedMinutes:23, earnings:{amount:42,currency:"BWP"} },
@@ -36,7 +25,8 @@ function Money({ amount }: { amount:number }) {
 
 export function ClientWorkspace() {
   const repository = useMemo(()=>new LocalRepository(storage),[]);
-  const [selectedRestaurant, setSelectedRestaurant] = useState<Restaurant | null>(null);
+  const [selectedRestaurant, setSelectedRestaurant] = useState<DemoStorefront | null>(null);
+  const [search,setSearch] = useState("");
   const [cart, setCart] = useState<CartLine[]>([]);
   const [address, setAddress] = useState<Address>({label:"Home",area:"Gaborone",landmark:""});
   const [filters, setFilters] = useState<string[]>(["Fast delivery"]);
@@ -47,12 +37,24 @@ export function ClientWorkspace() {
 
   const total = cart.reduce((sum, line) => sum + line.quantity * line.unitPrice.amount, 0);
 
-  const addItem = (item: MenuItem) => {
+  const visibleStorefronts = useMemo(()=>{
+    const q=search.trim().toLowerCase();
+    if(!q) return gaboroneStorefronts;
+    return gaboroneStorefronts.filter(store =>
+      store.name.toLowerCase().includes(q) ||
+      store.area.toLowerCase().includes(q) ||
+      store.cuisines.some(cuisine=>cuisine.toLowerCase().includes(q))
+    );
+  },[search]);
+
+  const addMenuItem = (item: DemoMenuItem, index:number) => {
+    if(typeof item.price !== "number" || !selectedRestaurant) return;
+    const itemId=`${selectedRestaurant.id}-${index}`;
     setCart(lines => {
-      const existing = lines.find(line => line.itemId === item.id);
+      const existing = lines.find(line => line.itemId === itemId);
       const next = existing
-        ? lines.map(line => line.itemId === item.id ? {...line, quantity:line.quantity + 1} : line)
-        : [...lines,{id:crypto.randomUUID(),itemId:item.id,name:item.name,quantity:1,unitPrice:item.price}];
+        ? lines.map(line => line.itemId === itemId ? {...line, quantity:line.quantity + 1} : line)
+        : [...lines,{id:crypto.randomUUID(),itemId,name:item.name,quantity:1,unitPrice:{amount:item.price!,currency:"BWP"}}];
       repository.saveCart(next);
       return next;
     });
@@ -60,7 +62,7 @@ export function ClientWorkspace() {
 
   const placeOrder = async (paymentMethod:"cash"|"mobile_money"|"card") => {
     const id = `LG-${Math.floor(1000 + Math.random()*9000)}`;
-    const deliveryFee = selectedRestaurant?.deliveryFee.amount ?? 18;
+    const deliveryFee = selectedRestaurant?.deliveryFee ?? 18;
     await repository.saveCheckoutDraft({
       id,
       restaurantId:selectedRestaurant?.id ?? "mixed",
@@ -107,22 +109,49 @@ export function ClientWorkspace() {
         </div>
       </section>
 
+      <section className="overflow-hidden rounded-[2rem] bg-gradient-to-br from-sky-500 via-blue-600 to-violet-600 p-6 text-white shadow-soft">
+        <p className="text-sm font-bold text-white/70">Gaborone food discovery</p>
+        <div className="mt-2 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+          <div>
+            <h2 className="text-3xl font-black">50 storefronts. One city.</h2>
+            <p className="mt-2 max-w-xl text-sm text-white/80">Proof-of-concept catalogue built from current public restaurant listings and public menus. Demo listings are not merchant partnerships yet.</p>
+          </div>
+          <input value={search} onChange={e=>setSearch(e.target.value)}
+            placeholder="Search restaurant or cuisine"
+            className="w-full rounded-2xl border border-white/20 bg-white/15 px-4 py-3 text-white placeholder:text-white/60 outline-none backdrop-blur md:max-w-sm" />
+        </div>
+      </section>
+
       <section>
         <div className="mb-4 flex items-end justify-between">
-          <div><p className="text-sm text-slate-500">Nearby</p><h2 className="text-2xl font-black">Restaurants</h2></div>
-          <button className="text-sm font-semibold">See all</button>
+          <div><p className="text-sm text-slate-500">Gaborone catalogue</p><h2 className="text-2xl font-black">{visibleStorefronts.length} restaurants</h2></div>
+          <span className="rounded-full bg-sky-100 px-3 py-1 text-xs font-black text-sky-700">DEMO STOREFRONTS</span>
         </div>
-        <div className="grid gap-4 md:grid-cols-3">
-          {restaurants.map(r=>(
+        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+          {visibleStorefronts.map(r=>(
             <button key={r.id} onClick={()=>setSelectedRestaurant(r)}
-              className="overflow-hidden rounded-[1.75rem] bg-white text-left shadow-soft">
-              <div className="aspect-[16/9] bg-gradient-to-br from-slate-200 to-slate-100 p-5">
-                <span className="rounded-full bg-white/90 px-3 py-1 text-xs font-bold">{r.etaMinutes} min</span>
+              className="group overflow-hidden rounded-[1.75rem] bg-white text-left shadow-soft transition hover:-translate-y-1 hover:shadow-xl">
+              <div className="relative aspect-[16/10] overflow-hidden">
+                <img src={r.image} alt="" loading="lazy" className="h-full w-full object-cover transition duration-500 group-hover:scale-105"/>
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent"/>
+                <div className="absolute left-4 top-4 flex gap-2">
+                  <span className="rounded-full bg-white/95 px-3 py-1 text-xs font-black text-slate-900">{r.etaMinutes} min</span>
+                  {r.menu?.length ? <span className="rounded-full bg-emerald-400 px-3 py-1 text-xs font-black text-emerald-950">MENU</span> : null}
+                </div>
+                <div className="absolute inset-x-4 bottom-4">
+                  <div className="mb-2 inline-flex h-11 w-11 items-center justify-center rounded-2xl text-lg font-black text-white shadow-lg"
+                    style={{background:`linear-gradient(135deg,${r.brand[0]},${r.brand[1]})`}}>
+                    {r.name.split(" ").slice(0,2).map(x=>x[0]).join("").toUpperCase()}
+                  </div>
+                  <h3 className="text-xl font-black text-white">{r.name}</h3>
+                </div>
               </div>
               <div className="p-5">
-                <h3 className="text-lg font-black">{r.name}</h3>
-                <p className="mt-1 text-sm text-slate-500">{r.cuisines.join(" · ")}</p>
-                <div className="mt-3 flex justify-between text-sm"><span>★ {r.rating}</span><span><Money amount={r.deliveryFee.amount}/> delivery</span></div>
+                <p className="text-sm text-slate-500">{r.cuisines.join(" · ")} · {r.area}</p>
+                <div className="mt-3 flex items-center justify-between text-sm">
+                  <span className="font-bold text-amber-600">★ {r.rating}{r.reviews ? ` (${r.reviews})` : ""}</span>
+                  <span className="font-semibold text-slate-700">P{r.deliveryFee} delivery</span>
+                </div>
               </div>
             </button>
           ))}
@@ -130,18 +159,38 @@ export function ClientWorkspace() {
       </section>
 
       {selectedRestaurant && (
-        <section className="rounded-[2rem] bg-white p-6 shadow-soft">
-          <div className="flex items-start justify-between gap-4">
-            <div><p className="text-sm text-slate-500">Menu</p><h2 className="text-2xl font-black">{selectedRestaurant.name}</h2></div>
-            <button onClick={()=>setSelectedRestaurant(null)} className="rounded-full border px-4 py-2 text-sm">Close</button>
+        <section className="overflow-hidden rounded-[2rem] bg-white shadow-soft">
+          <div className="relative min-h-[260px] overflow-hidden p-6 text-white"
+            style={{background:`linear-gradient(135deg,${selectedRestaurant.brand[0]}e6,${selectedRestaurant.brand[1]}e6), url("${selectedRestaurant.image}") center/cover`}}>
+            <button onClick={()=>setSelectedRestaurant(null)} className="absolute right-5 top-5 rounded-full bg-white/90 px-4 py-2 text-sm font-bold text-slate-900">Close</button>
+            <div className="absolute bottom-6 left-6 right-6">
+              <p className="text-xs font-black uppercase tracking-[.18em] text-white/70">Demo storefront · {selectedRestaurant.sourceLabel}</p>
+              <h2 className="mt-2 text-4xl font-black">{selectedRestaurant.name}</h2>
+              <p className="mt-2 text-white/80">{selectedRestaurant.cuisines.join(" · ")} · {selectedRestaurant.area}</p>
+            </div>
           </div>
-          <div className="mt-5 divide-y">
-            {menu.filter(item=>item.restaurantId===selectedRestaurant.id).map(item=>(
-              <div key={item.id} className="flex items-center justify-between gap-4 py-4">
-                <div><h3 className="font-bold">{item.name}</h3><p className="text-sm text-slate-500">{item.description}</p><p className="mt-2 font-bold"><Money amount={item.price.amount}/></p></div>
-                <button onClick={()=>addItem(item)} className="rounded-full bg-slate-950 px-4 py-2 text-sm font-bold text-white">Add</button>
+          <div className="p-6">
+            {selectedRestaurant.menu?.length ? (
+              <>
+                <div className="mb-4 flex items-center justify-between"><h3 className="text-xl font-black">Public menu preview</h3><a href={selectedRestaurant.sourceUrl} target="_blank" rel="noreferrer" className="text-sm font-bold text-blue-600">Source ↗</a></div>
+                <div className="divide-y">
+                  {selectedRestaurant.menu.map((item,index)=>(
+                    <div key={item.name} className="flex items-center justify-between gap-4 py-4">
+                      <div><h4 className="font-bold">{item.name}</h4><p className="mt-1 text-xs text-slate-500">{item.note}</p>{typeof item.price==="number" && <p className="mt-2 font-black">P{item.price.toFixed(2)}</p>}</div>
+                      {typeof item.price==="number"
+                        ? <button onClick={()=>addMenuItem(item,index)} className="rounded-full bg-blue-600 px-4 py-2 text-sm font-black text-white">Add</button>
+                        : <span className="rounded-full bg-amber-100 px-3 py-2 text-xs font-black text-amber-800">Preview</span>}
+                    </div>
+                  ))}
+                </div>
+              </>
+            ) : (
+              <div className="rounded-2xl bg-slate-50 p-5">
+                <p className="font-black">Storefront ready · menu import pending</p>
+                <p className="mt-1 text-sm text-slate-500">The restaurant is present as a discovery proof of concept. We will only enable ordering after a menu is sourced or the merchant claims the storefront.</p>
+                <a href={selectedRestaurant.sourceUrl} target="_blank" rel="noreferrer" className="mt-4 inline-block text-sm font-bold text-blue-600">View public listing ↗</a>
               </div>
-            ))}
+            )}
           </div>
         </section>
       )}
@@ -156,7 +205,7 @@ export function ClientWorkspace() {
       )}
 
       {checkoutOpen && cart.length > 0 && (
-        <CheckoutPanel lines={cart} deliveryFee={selectedRestaurant?.deliveryFee.amount ?? 18} onPlaceOrder={placeOrder}/>
+        <CheckoutPanel lines={cart} deliveryFee={selectedRestaurant?.deliveryFee ?? 18} onPlaceOrder={placeOrder}/>
       )}
 
       {lastOrder && (
