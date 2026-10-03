@@ -18,8 +18,8 @@ const navByRole: Record<UserRole, { label: string; icon: typeof House }[]> = {
   admin: [{label:"Overview",icon:LayoutDashboard},{label:"Orders",icon:UtensilsCrossed},{label:"Partners",icon:Store},{label:"Account",icon:UserRound}]
 };
 
-function Workspace({ role }: { role: UserRole }) {
-  if (role === "client") return <ClientWorkspace />;
+function Workspace({ role, active }: { role: UserRole; active: string }) {
+  if (role === "client") return <ClientWorkspace tab={active} />;
   if (role === "driver") return <DriverWorkspace />;
   if (role === "restaurant") return <RestaurantWorkspace />;
   return <AdminWorkspace />;
@@ -80,7 +80,7 @@ export function App() {
               {current.actions.map(action=><button key={action} className="rounded-2xl bg-white/10 px-4 py-4 text-left text-sm font-semibold hover:bg-white/15">{action}</button>)}
             </div>
           </div>
-          <Workspace role={role}/>
+          <Workspace role={role} active={active}/>
         </section>
       </main>
 
