@@ -44,8 +44,10 @@ export function App() {
       <header className="sticky top-0 z-30 border-b border-black/5 bg-white/90 backdrop-blur">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 md:px-8">
           <div>
-            <div className="text-xl font-black tracking-tight">Loeto Go</div>
-            <div className="text-xs text-slate-500">Botswana moves with you</div>
+            <div className="flex items-center gap-2">
+              <span className="grid h-9 w-9 place-items-center rounded-2xl bg-gradient-to-br from-sky-500 to-violet-600 text-sm font-black text-white shadow-lg shadow-blue-500/20">LG</span>
+              <div><div className="text-xl font-black tracking-tight">Loeto Go</div><div className="text-xs text-slate-500">Botswana moves with you</div></div>
+            </div>
           </div>
           <select aria-label="Switch demo role" value={role} onChange={e=>selectRole(e.target.value as UserRole)}
             className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-medium">
@@ -60,7 +62,7 @@ export function App() {
           <div className="sticky top-24 space-y-2 rounded-3xl bg-white p-3 shadow-soft">
             {nav.map(({label,icon:Icon})=>(
               <button key={label} onClick={()=>setActive(label)}
-                className={`flex w-full items-center gap-3 rounded-2xl px-4 py-3 text-left text-sm font-medium ${active===label?"bg-slate-950 text-white":"hover:bg-slate-50"}`}>
+                className={`flex w-full items-center gap-3 rounded-2xl px-4 py-3 text-left text-sm font-medium ${active===label?"bg-gradient-to-r from-blue-600 to-violet-600 text-white":"hover:bg-slate-50"}`}>
                 <Icon size={18}/>{label}
               </button>
             ))}
@@ -68,7 +70,9 @@ export function App() {
         </aside>
 
         <section className="min-w-0 space-y-6">
-          <div className="overflow-hidden rounded-[2rem] bg-slate-950 p-7 text-white md:p-10">
+          <div className="relative overflow-hidden rounded-[2rem] bg-gradient-to-br from-sky-500 via-blue-600 to-violet-600 p-7 text-white shadow-xl shadow-blue-500/15 md:p-10">
+            <div className="pointer-events-none absolute -right-20 -top-20 h-64 w-64 rounded-full bg-fuchsia-400/30 blur-3xl" />
+            <div className="pointer-events-none absolute -bottom-24 left-20 h-64 w-64 rounded-full bg-cyan-300/20 blur-3xl" />
             <p className="mb-3 text-sm text-white/60">{role} · {active}</p>
             <h1 className="max-w-2xl text-4xl font-black tracking-tight md:text-6xl">{current.title}</h1>
             <p className="mt-4 max-w-xl text-white/70">{current.subtitle}</p>
