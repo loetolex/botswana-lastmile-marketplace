@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { SafeAreaView, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { StatusBar } from "expo-status-bar";
 import type { UserRole } from "@loetogo/domain";
@@ -13,9 +13,11 @@ const labels: Record<UserRole,string[]> = {
 };
 
 const clientRestaurants = [
-  {name:"Mokolodi Kitchen",meta:"Setswana · Grill",eta:"28 min",fee:"P18"},
-  {name:"Urban Bowl",meta:"Healthy · Wraps",eta:"24 min",fee:"P15"},
-  {name:"Kgale Pizza Co.",meta:"Pizza · Fast food",eta:"35 min",fee:"P20"}
+  {name:"Zen Cafe Lounge",meta:"Fine dining · Sushi · Grill",eta:"27 min",fee:"P20"},
+  {name:"The Daily Grind",meta:"Cafe · Breakfast · Lunch",eta:"22 min",fee:"P15"},
+  {name:"Two Six Seven",meta:"Steakhouse · Pizza · Bar",eta:"24 min",fee:"P18"},
+  {name:"Casa del Sol",meta:"European · Contemporary",eta:"35 min",fee:"P22"},
+  {name:"Nando's Riverwalk",meta:"Chicken · PERi-PERi",eta:"21 min",fee:"P15"}
 ];
 
 const driverOffers = [
@@ -38,9 +40,29 @@ function ChipGroup({values,onToggle}:{values:string[];onToggle:(value:string)=>v
   })}</View>;
 }
 
-function ClientHome() {
+function ClientHome({active}:{active:string}) {
   const [filters,setFilters]=useState(["Fast delivery"]);
+  const [query,setQuery]=useState("");
   const toggle=(v:string)=>setFilters(items=>items.includes(v)?items.filter(x=>x!==v):[...items,v]);
+  const visible=clientRestaurants.filter(item=>!query.trim() || (item.name+" "+item.meta).toLowerCase().includes(query.toLowerCase()));
+
+  if(active==="Search") return <>
+    <Text style={styles.sectionTitle}>Search restaurants</Text>
+    <TextInput value={query} onChangeText={setQuery} placeholder="Try sushi, chicken, breakfast..." style={styles.searchInput}/>
+    {visible.map(item=><View key={item.name} style={styles.card}><Text style={styles.cardTitle}>{item.name}</Text><Text style={styles.cardCopy}>{item.meta}</Text><View style={styles.rowBetween}><Text style={styles.smallStrong}>{item.eta}</Text><Text style={styles.smallStrong}>{item.fee} delivery</Text></View></View>)}
+  </>;
+
+  if(active==="Orders") return <>
+    <Text style={styles.sectionTitle}>Orders</Text>
+    <View style={styles.card}><Text style={styles.eyebrow}>LOCAL TEST ORDER</Text><Text style={styles.cardTitle}>LG-1042</Text><Text style={styles.cardCopy}>2× Seswaa Taco · Placed</Text><Text style={styles.pay}>P440</Text></View>
+  </>;
+
+  if(active==="Profile") return <>
+    <Text style={styles.sectionTitle}>Your Loeto Go</Text>
+    <View style={styles.card}><Text style={styles.eyebrow}>ACCOUNT</Text><Text style={styles.cardTitle}>Local test customer</Text><Text style={styles.cardCopy}>Storage: local state now · Google Drive later</Text></View>
+    <View style={styles.card}><Text style={styles.eyebrow}>DELIVERY ADDRESS</Text><Text style={styles.cardTitle}>Home · Gaborone</Text><Text style={styles.cardCopy}>Add landmark and plot details when Google profile setup is connected.</Text></View>
+  </>;
+
   return <>
     <View style={styles.sectionHeader}><Text style={styles.eyebrow}>DELIVER TO</Text><Text style={styles.sectionTitle}>Home · Gaborone</Text></View>
     <ChipGroup values={filters} onToggle={toggle}/>
@@ -104,7 +126,7 @@ export default function App() {
   const nav=useMemo(()=>labels[role],[role]);
 
   const changeRole=(next:UserRole)=>{setRole(next);setActive(labels[next][0]);};
-  const content=role==="client"?<ClientHome/>:role==="driver"?<DriverHome/>:role==="restaurant"?<RestaurantHome/>:<AdminHome/>;
+  const content=role==="client"?<ClientHome active={active}/>:role==="driver"?<DriverHome/>:role==="restaurant"?<RestaurantHome/>:<AdminHome/>;
 
   return <SafeAreaView style={styles.safe}>
     <StatusBar style="dark"/>
@@ -149,6 +171,7 @@ const styles=StyleSheet.create({
   cardCopy:{color:"#64748b",marginTop:5,lineHeight:20},
   imagePlaceholder:{height:128,borderRadius:18,backgroundColor:"#e2e8f0",padding:12,marginBottom:14},
   imageBadge:{alignSelf:"flex-start",backgroundColor:"#fff",paddingHorizontal:10,paddingVertical:6,borderRadius:999,fontSize:11,fontWeight:"800"},
+  searchInput:{backgroundColor:"#fff",borderWidth:1,borderColor:"#dbeafe",borderRadius:18,paddingHorizontal:16,paddingVertical:14,fontSize:16,color:"#1e3a8a",marginBottom:12},
   rowBetween:{flexDirection:"row",alignItems:"center",justifyContent:"space-between",gap:12},
   smallStrong:{fontSize:12,fontWeight:"800",color:"#1e3a8a"},
   pay:{fontSize:27,fontWeight:"900",color:"#1e3a8a",marginTop:2},
